@@ -7,6 +7,11 @@
 -- ============================================================
 
 -- 1. Basic settings
+--
+-- Moved to here before any other plug in initialization
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -20,6 +25,380 @@ vim.opt.signcolumn = "yes"
 vim.opt.termguicolors = true
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.updatetime = 300
+
+-- 1.1 Load colorscheme
+--
+
+--[[
+mkdir -p ~/.local/share/nvim/site/pack/themes/start
+
+git clone https://github.com/folke/tokyonight.nvim.git \
+  ~/.local/share/nvim/site/pack/themes/start/tokyonight.nvim
+
+THEMES="$HOME/.local/share/nvim/site/pack/themes/start"
+mkdir -p "$THEMES"
+
+git clone https://github.com/catppuccin/nvim.git \
+  "$THEMES/catppuccin"
+
+git clone https://github.com/rebelot/kanagawa.nvim.git \
+  "$THEMES/kanagawa.nvim"
+
+git clone https://github.com/EdenEast/nightfox.nvim.git \
+  "$THEMES/nightfox.nvim"
+
+git clone https://github.com/rose-pine/neovim.git \
+  "$THEMES/rose-pine"
+
+--]]
+--
+-- Tokyo Night colorscheme
+vim.opt.termguicolors = true
+--[[
+require("tokyonight").setup({
+    style = "night",
+    transparent = false,
+    styles = {
+        comments = { italic = false },
+        keywords = { italic = false },
+    },
+})
+--]]
+vim.cmd.colorscheme("catppuccin-mocha")
+
+
+--[[
+--
+mkdir -p ~/.local/share/nvim/site/pack/plugins/start
+
+git clone https://github.com/nvim-lualine/lualine.nvim.git \
+  ~/.local/share/nvim/site/pack/plugins/start/lualine.nvim
+
+nvim
+----]]
+
+-- 1.2 Lualine status line
+
+-- ==========================================
+-- Lualine statusline
+-- ==========================================
+vim.opt.laststatus = 3
+
+require("lualine").setup({
+    options = {
+        theme = "auto",
+        icons_enabled = true,
+        component_separators = { left = "│", right = "│" },
+        section_separators = { left = "", right = "" },
+        globalstatus = true,
+    },
+
+    sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", "diff", "diagnostics" },
+        lualine_c = { { "filename", path = 1 } },
+        lualine_x = { "encoding", "fileformat", "filetype" },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+    },
+})
+
+
+-- 1.3 tree-sitter
+--
+--[[
+--
+mkdir -p ~/.local/share/nvim/site/pack/plugins/start
+
+git clone --branch master \
+  https://github.com/nvim-treesitter/nvim-treesitter.git \
+  ~/.local/share/nvim/site/pack/plugins/start/nvim-treesitter
+
+----
+--- Change from main to master
+---
+TS="$HOME/.local/share/nvim/site/pack/plugins/start/nvim-treesitter"
+
+git -C "$TS" fetch origin master
+git -C "$TS" switch master
+git -C "$TS" pull --ff-only origin master
+
+--]]
+-- ==========================================
+-- Tree-sitter (Neovim 0.11 / master branch)
+-- ==========================================
+require("nvim-treesitter.configs").setup({
+    ensure_installed = {
+        "rust",
+        "c",
+        "cpp",
+        "lua",
+        "nix",
+        "toml",
+        "markdown",
+        "markdown_inline",
+        "bash",
+        "json",
+        "yaml",
+        "vim",
+        "vimdoc",
+    },
+
+    sync_install = false,
+    auto_install = false,
+
+    highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+    },
+
+    indent = {
+        enable = true,
+    },
+})
+
+-- 1.4 nvim-tree
+--
+--[[
+mkdir -p ~/.local/share/nvim/site/pack/plugins/start
+
+git clone https://github.com/nvim-tree/nvim-tree.lua.git \
+  ~/.local/share/nvim/site/pack/plugins/start/nvim-tree.lua
+--]]
+
+-- ==========================================
+-- Nvim-tree file explorer
+-- ==========================================
+
+-- Recommended by nvim-tree
+
+require("nvim-tree").setup({
+    sort = {
+        sorter = "case_sensitive",
+    },
+
+    view = {
+        width = 35,
+        side = "left",
+        preserve_window_proportions = true,
+    },
+
+    renderer = {
+        group_empty = true,
+
+        highlight_git = true,
+
+        icons = {
+            show = {
+                file = true,
+                folder = true,
+                folder_arrow = true,
+                git = true,
+            },
+        },
+    },
+
+    filters = {
+        dotfiles = false,
+        git_ignored = false,
+    },
+
+    git = {
+        enable = true,
+        ignore = false,
+    },
+
+    update_focused_file = {
+        enable = true,
+        update_root = false,
+    },
+
+    actions = {
+        open_file = {
+            quit_on_open = false,
+            resize_window = true,
+        },
+    },
+})
+
+-- nvim-tree toggle file explorer
+--[[
+vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", {
+    desc = "Toggle file explorer",
+})
+--]]
+--
+-- Toggle file explorer
+vim.keymap.set("n", "<leader>e", function()
+    require("nvim-tree.api").tree.toggle()
+end, {
+    desc = "Toggle file explorer",
+    silent = true,
+})
+-- Focus file explorer
+vim.keymap.set("n", "<leader>o", "<cmd>NvimTreeFocus<CR>", {
+    desc = "Focus file explorer",
+})
+
+-- Find current file in tree
+vim.keymap.set("n", "<leader>fe", "<cmd>NvimTreeFindFile<CR>", {
+    desc = "Reveal current file",
+})
+
+--1.5
+--
+--[[
+brew install ripgrep fd
+PLUGINS="$HOME/.local/share/nvim/site/pack/plugins/start"
+
+mkdir -p "$PLUGINS"
+
+git clone https://github.com/nvim-lua/plenary.nvim.git \
+  "$PLUGINS/plenary.nvim"
+
+git clone https://github.com/nvim-telescope/telescope.nvim.git \
+  "$PLUGINS/telescope.nvim"
+
+optional telescope-fzf-native
+
+brew install cmake
+
+PLUGINS="$HOME/.local/share/nvim/site/pack/plugins/start"
+
+git clone https://github.com/nvim-telescope/telescope-fzf-native.nvim.git \
+  "$PLUGINS/telescope-fzf-native.nvim"
+
+make -C "$PLUGINS/telescope-fzf-native.nvim"
+
+telescope.load_extension("fzf")
+
+
+--]]
+
+-- ==========================================
+-- Telescope fuzzy finder
+-- ==========================================
+
+local telescope = require("telescope")
+local builtin = require("telescope.builtin")
+local actions = require("telescope.actions")
+
+telescope.setup({
+    defaults = {
+        prompt_prefix = "   ",
+        selection_caret = "➜ ",
+
+        path_display = { "smart" },
+
+        sorting_strategy = "ascending",
+
+        layout_config = {
+            horizontal = {
+                prompt_position = "top",
+                preview_width = 0.55,
+            },
+        },
+
+        mappings = {
+            i = {
+                ["<C-j>"] = actions.move_selection_next,
+                ["<C-k>"] = actions.move_selection_previous,
+                ["<Esc>"] = actions.close,
+            },
+        },
+    },
+
+    pickers = {
+        find_files = {
+            hidden = true,
+        },
+    },
+})
+
+telescope.load_extension("fzf")
+
+
+-- ==========================================
+-- Telescope keybindings
+-- ==========================================
+
+vim.keymap.set("n", "<leader>sf", builtin.find_files, {
+    desc = "Search files",
+})
+
+vim.keymap.set("n", "<leader>sg", builtin.live_grep, {
+    desc = "Search text (ripgrep)",
+})
+
+vim.keymap.set("n", "<leader>sb", builtin.buffers, {
+    desc = "Search open buffers",
+})
+
+vim.keymap.set("n", "<leader>sh", builtin.help_tags, {
+    desc = "Search help",
+})
+
+vim.keymap.set("n", "<leader>sr", builtin.oldfiles, {
+    desc = "Recent files",
+})
+
+vim.keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, {
+    desc = "Search document symbols",
+})
+
+vim.keymap.set("n", "<leader>sd", builtin.diagnostics, {
+    desc = "Search diagnostics",
+})
+
+vim.keymap.set("n", "<leader>sc", builtin.commands, {
+    desc = "Search Neovim commands",
+})
+
+
+-- 1.6 blink cmp
+--
+--[[
+--]]
+--
+
+-- ==========================================
+-- Blink Completion
+-- ==========================================
+require("blink.cmp").setup({
+    keymap = {
+        preset = "default",
+    },
+
+    appearance = {
+        nerd_font_variant = "mono",
+    },
+
+    completion = {
+        documentation = {
+            auto_show = true,
+            auto_show_delay_ms = 300,
+        },
+
+        menu = {
+            border = "rounded",
+        },
+    },
+
+    sources = {
+        default = {
+            "lsp",
+            "path",
+            "snippets",
+            "buffer",
+        },
+    },
+
+    fuzzy = {
+        --implementation = "lua",
+        implementation = "prefer_rust_with_warning",
+    },
+})
+
 
 -- 2. Diagnostics
 vim.diagnostic.config({
@@ -192,6 +571,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         )
 
         -- Built-in completion
+        --[[
         if client:supports_method("textDocument/completion") then
             vim.lsp.completion.enable(
                 true,
@@ -200,6 +580,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
                 { autotrigger = true }
             )
         end
+        --]]
     end,
 })
 
@@ -415,7 +796,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- 13. Diagnostics keymaps
-vim.keymap.set("n", "<leader>e", function()
+vim.keymap.set("n", "<leader>d", function()
     vim.diagnostic.open_float()
 end, { desc = "Show diagnostics" })
 
