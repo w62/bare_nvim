@@ -15,8 +15,8 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.number = false
+vim.opt.relativenumber = false
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
@@ -133,15 +133,8 @@ require("nvim-treesitter.configs").setup({
         "c",
         "cpp",
         "lua",
-        "nix",
         "toml",
         "markdown",
-        "markdown_inline",
-        "bash",
-        "json",
-        "yaml",
-        "vim",
-        "vimdoc",
     },
 
     sync_install = false,
@@ -358,6 +351,17 @@ vim.keymap.set("n", "<leader>sc", builtin.commands, {
 -- 1.6 blink cmp
 --
 --[[
+--PLUGINS="$HOME/.local/share/nvim/site/pack/plugins/start"
+
+mkdir -p "$PLUGINS"
+
+git clone https://github.com/saghen/blink.cmp.git \
+  "$PLUGINS/blink.cmp"
+
+cd "$PLUGINS/blink.cmp"
+
+git fetch --tags
+git checkout "$(git tag -l 'v1.*' --sort=-v:refname | head -1)"
 --]]
 --
 
