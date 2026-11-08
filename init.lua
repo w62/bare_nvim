@@ -403,7 +403,42 @@ require("blink.cmp").setup({
     },
 })
 
+-- 1.7 Markview.nvim
+--
+--
+--[[
+NVIM_DATA="$(nvim --clean --headless \
+  '+lua io.write(vim.fn.stdpath("data"))' \
+  +qa 2>/dev/null)"
 
+PLUGIN_DIR="$NVIM_DATA/site/pack/plugins/start"
+
+mkdir -p "$PLUGIN_DIR"
+
+git clone https://github.com/OXY2DEV/markview.nvim.git \
+  "$PLUGIN_DIR/markview.nvim"
+
+    --]]
+-- Markview.nvim configuration
+--
+require("markview").setup({
+    preview = {
+        icon_provider = "internal",
+    },
+})
+
+-- Toggle inline Markdown rendering
+vim.keymap.set("n", "<leader>mp", "<cmd>Markview toggle<CR>", {
+    desc = "Toggle Markdown preview",
+    silent = true,
+})
+
+-- Toggle side-by-side Markdown preview
+vim.keymap.set("n", "<leader>ms", "<cmd>Markview splitToggle<CR>", {
+    desc = "Toggle Markdown split preview",
+    silent = true,
+})
+--
 -- 2. Diagnostics
 vim.diagnostic.config({
     virtual_text = true,
